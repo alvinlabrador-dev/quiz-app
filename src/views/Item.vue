@@ -1,19 +1,209 @@
 <template>
-  <div>
-    <the-quiz :quiz="quizItems[currentItem - 1]" :item="currentItem" />
+  <div class="quiz" v-if="quiz.hasOwnProperty('category')">
+    <div class="quiz__info">
+      <div class="quiz__info__number">
+        Question <strong>#{{ item }}</strong
+        >:
+      </div>
+      <div class="quiz__info_category">
+        Category: <strong>{{ quiz.category }}</strong>
+      </div>
+    </div>
+    <div class="quiz__item">
+      <div class="quiz__progress">
+        <div class="quiz__progress--bar" :style="`width: ${progress}`"></div>
+      </div>
+      <h2 class="quiz__item__question" v-html="quiz.question"></h2>
+      <div class="quiz__item__answers">
+        <label
+          class="quiz__item__answer"
+          :class="{
+            'quiz__item__answer--selected': answer === option
+          }"
+          v-for="(option, index) in quiz.answers"
+          :key="option"
+          :data-choice="choices[index]"
+          :for="`answer--${index}`"
+        >
+          <input
+            :id="`answer--${index}`"
+            type="radio"
+            v-model="answer"
+            :value="option"
+            name="answer"
+            @change="updateStatus"
+          />
+          <span v-html="option"></span>
+        </label>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import { mapState } from "vuex";
-import TheQuiz from "@/components/TheQuiz";
+import { mapMutations } from "vuex";
 export default {
-  components: { TheQuiz },
+  name: "TheQuiz",
+  props: ["item", "quiz"],
+  data() {
+    return {
+      choices: ["a", "b", "c", "d"],
+      answer: ""
+    };
+  },
   computed: {
-    ...mapState(["quizItems"]),
-    currentItem() {
-      return +this.$route.params.itemId.slice(-1);
+    nextItem() {
+      return this.item < 10 ? this.item + 1 : 10;
+    },
+    progress() {
+      return `${this.item * 10}%`;
+    },
+    status() {
+      return this.answer === this.quiz.correct_answer ? "correct" : "incorrect";
+    }
+  },
+  methods: {
+    ...mapMutations(["updateQuizItemStatus"]),
+    updateStatus() {
+      // update quiz status
+      this.updateQuizItemStatus({ status: this.status, id: this.quiz.id });
+
+      // redirect to next item
+      this.$router.replace(`/quiz/item${this.nextItem}`);
     }
   }
 };
 </script>
+
+<style lang="scss" scoped>
+.quiz {
+  line-height: 1.5;
+  &__info {
+    display: flex;
+    opacity: 0.2;
+    flex-direction: column;
+    text-align: right;
+    font-size: 14px;
+
+    &__number {
+      display: none;
+    }
+
+    @media screen and (min-width: 768px) {
+      align-items: center;
+      justify-content: space-between;
+      flex-direction: row;
+      font-size: inherit;
+
+      &__number {
+        display: block;
+      }
+    }
+  }
+  &__item {
+    background: #fff;
+    color: #2c5364;
+    padding: 2rem 1rem;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    @media screen and (min-width: 768px) {
+      padding: 3.125rem;
+      min-height: 20.25rem;
+    }
+
+    &__question {
+      font-size: 1.2rem;
+      margin: 0 0 1rem;
+      text-align: left;
+
+      @media screen and (min-width: 768px) {
+        font-size: 1.5rem;
+        margin: 0 0 3rem;
+        text-align: center;
+      }
+    }
+
+    &__answers {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    &__answer {
+      display: flex;
+      align-items: center;
+      font: inherit;
+      color: #949494;
+      cursor: pointer;
+      padding: 0;
+      margin: 0 1rem 1rem;
+      background: transparent;
+      font-weight: 600;
+      transition: 0.2s;
+      overflow: hidden;
+      justify-content: left;
+      flex-grow: 1;
+      width: 100%;
+
+      @media screen and (min-width: 1024px) {
+        width: auto;
+        justify-content: left;
+      }
+
+      input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        left: -1px;
+        top: -1px;
+      }
+
+      &::before {
+        content: attr(data-choice);
+        text-transform: uppercase;
+        width: 1.6875rem;
+        height: 1.6875rem;
+        text-align: center;
+        margin-right: 0.625rem;
+        line-height: 1.6875rem;
+        border-radius: 50%;
+        border: 0.125rem solid #949494;
+        transition: 0.2s;
+        flex-shrink: 0;
+      }
+
+      &:hover,
+      &--selected {
+        color: #2c5364;
+
+        &::before {
+          border-color: #2c5364;
+        }
+      }
+    }
+  }
+
+  &__progress {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: #b7b7b7;
+    height: 0.375rem;
+
+    &--bar {
+      transition: 0.5s;
+      width: 0;
+      height: 100%;
+      position: absolute;
+      left: 0;
+      top: 0;
+      background: #f2994a;
+    }
+  }
+}
+</style>

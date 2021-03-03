@@ -33,18 +33,14 @@ export default {
 </script>
 
 <style lang="scss">
-html,
-body {
-  height: 100%;
-}
 html {
   font-size: 16px;
 }
 body {
   font-family: "Poppins", sans-serif;
   font-weight: 300;
-  background: linear-gradient(45deg, #0f2027 0, #2c5364 100%);
-  box-sizing: border-box;
+  background: linear-gradient(45deg, #0f2027 0, #2c5364 100%) no-repeat;
+  background-size: cover;
   margin: 0;
   color: #fff;
 }
@@ -87,12 +83,15 @@ h1 {
 
 <style lang="scss" scoped>
 section {
-  padding: 0 0 5rem;
   min-height: 100vh;
   display: flex;
   text-align: center;
   align-items: center;
   justify-content: center;
+
+  @media screen and (min-width: 768px) {
+    padding: 0 0 5rem;
+  }
 }
 .link {
   &--github {

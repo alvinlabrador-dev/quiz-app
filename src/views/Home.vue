@@ -2,7 +2,7 @@
   <div class="page-content">
     <div v-if="!loading">
       <h1>Let's see how good you are with quizzes.</h1>
-      <button-group>
+      <button-group class="btn-grp">
         <app-button @click="getQuizzess">Take the quiz now</app-button> or
         <a class="link">Select category</a>
       </button-group>
@@ -45,5 +45,17 @@ export default {
 .link {
   text-decoration: underline;
   color: #f2c44b;
+}
+.page-content {
+  padding: 5rem 2rem;
+}
+.btn-grp {
+  flex-direction: column;
+  gap: 0.3rem;
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    gap: 1rem;
+  }
 }
 </style>

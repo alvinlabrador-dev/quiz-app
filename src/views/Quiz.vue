@@ -1,11 +1,18 @@
 <template>
-  <div class="quiz">
+  <div class="quiz-wrapper">
     <slot name="header">
       <h1>Let's see how good you are with quizzes.</h1>
     </slot>
     <div class="quiz__wrap">
-      <app-progress :items="quizItems" class="quiz__progress"></app-progress>
-      <router-view></router-view>
+      <app-progress
+        :items="quizItems"
+        :current="currentItem"
+        class="quiz__progress"
+      ></app-progress>
+      <router-view
+        :quiz="quizItems[currentItem - 1]"
+        :item="currentItem"
+      ></router-view>
     </div>
   </div>
 </template>
@@ -19,12 +26,23 @@ export default {
     AppProgress
   },
   computed: {
-    ...mapState(["quizItems"])
+    ...mapState(["quizItems"]),
+    currentItem() {
+      return +this.$route.params.itemId.slice(4);
+    }
   }
 };
 </script>
 
 <style lang="scss" scoped>
+.quiz-wrapper {
+  padding: 12rem 1rem 2rem;
+  overflow: hidden;
+
+  @media screen and (min-width: 768px) {
+    padding: 4rem;
+  }
+}
 h1 {
   position: absolute;
   top: 5rem;
@@ -54,7 +72,10 @@ h1 {
     max-width: 100%;
   }
   &__progress {
-    margin-bottom: 8rem;
+    margin-bottom: 1rem;
+    @media screen and (min-width: 768px) {
+      margin-bottom: 4rem;
+    }
   }
 }
 </style>
