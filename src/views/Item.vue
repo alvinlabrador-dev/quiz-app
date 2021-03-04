@@ -13,8 +13,16 @@
       <div class="quiz__progress">
         <div class="quiz__progress--bar" :style="`width: ${progress}`"></div>
       </div>
-      <h2 class="quiz__item__question" v-html="quiz.question"></h2>
-      <div class="quiz__item__answers">
+      <h2
+        class="quiz__item__question"
+        :class="{
+          'quiz__item__question--passed': isPassed,
+          'quiz__item__question--failed': !isPassed && lastStepAnswered
+        }"
+        v-html="lastStepAnswered ? resultHeading : quiz.question"
+      ></h2>
+
+      <div class="quiz__item__answers" v-if="!lastStepAnswered">
         <label
           class="quiz__item__answer"
           :class="{
@@ -36,12 +44,18 @@
           <span v-html="option"></span>
         </label>
       </div>
+
+      <div class="quiz__item__result" v-if="lastStepAnswered">
+        <p v-html="resultMessage"></p>
+        <p v-if="isGood">It's fun right? Try another quiz</p>
+        <p v-else>That's alright you can try another quiz</p>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { mapMutations } from "vuex";
+import { mapMutations, mapGetters } from "vuex";
 export default {
   name: "TheQuiz",
   props: ["item", "quiz"],
@@ -52,6 +66,7 @@ export default {
     };
   },
   computed: {
+    ...mapGetters(["correctAnswersCount", "quizCategoriesCount"]),
     nextItem() {
       return this.item < 10 ? this.item + 1 : 10;
     },
@@ -60,6 +75,23 @@ export default {
     },
     status() {
       return this.answer === this.quiz.correct_answer ? "correct" : "incorrect";
+    },
+    lastStepAnswered() {
+      return this.nextItem === 10 && this.quiz.status !== "open";
+    },
+    resultMessage() {
+      return `
+        You got ${this.correctAnswersCount}/10 correct answers from 4 categories. ${this.isGood}
+      `;
+    },
+    resultHeading() {
+      return `You ${this.isGood ? "Passed" : "Failed"}!`;
+    },
+    isPassed() {
+      return this.correctAnswersCount >= 5 && this.lastStepAnswered;
+    },
+    isGood() {
+      return this.isPassed ? "Good job!" : "";
     }
   },
   methods: {
@@ -69,7 +101,7 @@ export default {
       this.updateQuizItemStatus({ status: this.status, id: this.quiz.id });
 
       // redirect to next item
-      this.$router.replace(`/quiz/item${this.nextItem}`);
+      if (this.item !== 10) this.$router.replace(`/quiz/item${this.nextItem}`);
     }
   }
 };
@@ -152,6 +184,7 @@ export default {
       @media screen and (min-width: 1024px) {
         width: auto;
         justify-content: left;
+        flex-grow: 0;
       }
 
       input {

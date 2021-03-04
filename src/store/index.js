@@ -4,7 +4,6 @@ import { v4 as uuid4 } from "uuid";
 export default createStore({
   state: {
     quizItems: [],
-    loading: false,
     categories: []
   },
   mutations: {
@@ -65,10 +64,12 @@ export default createStore({
     }
   },
   getters: {
-    getQuizzes: state => state.quizItems,
-    getSingleQuiz: (_, getters) => id => {
-      return getters.getQuizes.find(quiz => quiz.id === id);
-    },
-    getLoadingStatus: state => state.loading
+    quizzes: state => state.quizItems,
+    correctAnswersCount: (_, getters) =>
+      getters.quizzes.filter(quiz => quiz.status === "correct").length,
+    quizCategories: (_, getters) => [
+      ...new Set(getters.quizzes.map(quiz => quiz.category))
+    ],
+    quizCategoriesCount: (_, getters) => getters.quizCategories.length
   }
 });

@@ -5,12 +5,12 @@
     </slot>
     <div class="quiz__wrap">
       <app-progress
-        :items="quizItems"
+        :items="quizzes"
         :current="currentItem"
         class="quiz__progress"
       ></app-progress>
       <router-view
-        :quiz="quizItems[currentItem - 1]"
+        :quiz="quizzes[currentItem - 1]"
         :item="currentItem"
       ></router-view>
     </div>
@@ -19,14 +19,14 @@
 
 <script>
 import AppProgress from "@/components/AppProgress";
-import { mapState } from "vuex";
+import { mapGetters } from "vuex";
 export default {
   name: "Step",
   components: {
     AppProgress
   },
   computed: {
-    ...mapState(["quizItems"]),
+    ...mapGetters(["quizzes"]),
     currentItem() {
       return +this.$route.params.itemId.slice(4);
     }
