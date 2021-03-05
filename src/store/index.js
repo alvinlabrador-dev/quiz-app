@@ -78,13 +78,18 @@ export default createStore({
         })
         .sort((a, b) => a.difficulty - b.difficulty);
 
-      // update the quizItems and loading state
+      // update the quizItems
       context.commit("setQuizItems", { quizItems: sortResults });
-      context.commit("setLoading", false);
+
+      // trigger callback
+      if (payload.callback) payload.callback();
+
+      // update restart and category state
       context.commit("setRestart", false);
       context.commit("setCategory", { category: "" });
 
-      if (payload.callback) payload.callback();
+      // delay setting the loading value to avoid flashes
+      setTimeout(context.commit("setLoading", false), 1000);
 
       return true;
     },
