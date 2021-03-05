@@ -1,79 +1,92 @@
 <template>
-  <div class="quiz" v-if="quiz.hasOwnProperty('category')">
-    <div class="quiz__info">
-      <div class="quiz__info__number">
-        Question <strong>#{{ item }}</strong
-        >:
+  <transition
+    enter-active-class="animate__animated animate__fadeIn"
+    leave-active-class="animate__animated animate__fadeOut"
+    mode="out-in"
+  >
+    <div class="quiz" v-if="quiz.hasOwnProperty('category')">
+      <div class="quiz__info">
+        <div class="quiz__info__number">
+          Question <strong>#{{ item }}</strong
+          >:
+        </div>
+        <div class="quiz__info_category">
+          Category: <strong>{{ quiz.category }}</strong>
+        </div>
       </div>
-      <div class="quiz__info_category">
-        Category: <strong>{{ quiz.category }}</strong>
-      </div>
-    </div>
-    <div class="quiz__item">
-      <div class="quiz__progress">
-        <div class="quiz__progress--bar" :style="`width: ${progress}`"></div>
-      </div>
-      <h2
-        class="quiz__item__question"
-        :class="{
-          'quiz__item__question--passed': isPassed,
-          'quiz__item__question--failed': !isPassed && lastStepAnswered
-        }"
-        v-html="lastStepAnswered ? resultHeading : quiz.question"
-      ></h2>
-
-      <div class="quiz__item__answers" v-if="!lastStepAnswered">
-        <label
-          class="quiz__item__answer"
+      <div class="quiz__item">
+        <div class="quiz__progress">
+          <div
+            class="quiz__progress__bar"
+            :class="{
+              'quiz__progress__bar--passed': isPassed,
+              'quiz__progress__bar--failed': !isPassed && lastStepAnswered
+            }"
+            :style="`width: ${progress}`"
+          ></div>
+        </div>
+        <h2
+          class="quiz__item__question"
           :class="{
-            'quiz__item__answer--selected': answer === option
+            'quiz__item__question--passed': isPassed,
+            'quiz__item__question--failed': !isPassed && lastStepAnswered
           }"
-          v-for="(option, index) in quiz.answers"
-          :key="option"
-          :data-choice="choices[index]"
-          :for="`answer--${index}`"
-        >
-          <input
-            :id="`answer--${index}`"
-            type="radio"
-            v-model="answer"
-            :value="option"
-            name="answer"
-            @change="updateStatus"
-          />
-          <span v-html="option"></span>
-        </label>
-      </div>
+          v-html="lastStepAnswered ? resultHeading : quiz.question"
+        ></h2>
 
-      <div class="quiz__item__result" v-if="lastStepAnswered">
-        <p v-html="resultMessage"></p>
-        <p v-if="isGood">
-          It's fun right? Try
-          <router-link :to="anotherQuiz" class="quiz__item__result__link"
-            >another quiz
-            <span class="quiz__item__result__icon"
-              ><app-icon name="refresh"
-            /></span>
-          </router-link>
-        </p>
-        <p v-else>
-          That's alright you can try
-          <router-link :to="anotherQuiz" class="quiz__item__result__link"
-            >another quiz
-            <span class="quiz__item__result__icon"
-              ><app-icon name="refresh"
-            /></span>
-          </router-link>
-        </p>
-        <p>
-          Go back to
-          <router-link :to="home" class="quiz__item__result__link"
-            >homepage</router-link
-          >.
-        </p>
+        <div class="quiz__item__answers" v-if="!lastStepAnswered">
+          <label
+            class="quiz__item__answer"
+            :class="{
+              'quiz__item__answer--selected': answer === option
+            }"
+            v-for="(option, index) in quiz.answers"
+            :key="option"
+            :data-choice="choices[index]"
+            :for="`answer--${index}`"
+          >
+            <input
+              :id="`answer--${index}`"
+              type="radio"
+              v-model="answer"
+              :value="option"
+              name="answer"
+              @change="updateStatus"
+            />
+            <span v-html="option"></span>
+          </label>
+        </div>
+
+        <div class="quiz__item__result" v-if="lastStepAnswered">
+          <p v-html="resultMessage"></p>
+          <p v-if="isGood">
+            It's fun right? Try
+            <router-link :to="anotherQuiz" class="quiz__item__result__link"
+              >another quiz
+              <span class="quiz__item__result__icon"
+                ><app-icon name="refresh"
+              /></span>
+            </router-link>
+          </p>
+          <p v-else>
+            That's alright you can try
+            <router-link :to="anotherQuiz" class="quiz__item__result__link"
+              >another quiz
+              <span class="quiz__item__result__icon"
+                ><app-icon name="refresh"
+              /></span>
+            </router-link>
+          </p>
+          <p>
+            Go back to
+            <router-link :to="home" class="quiz__item__result__link"
+              >homepage</router-link
+            >.
+          </p>
+        </div>
       </div>
     </div>
-  </div>
+  </transition>
 </template>
 
 <script>
@@ -147,7 +160,7 @@ export default {
     display: flex;
     opacity: 0.2;
     flex-direction: column;
-    text-align: right;
+    text-align: left;
     font-size: 14px;
 
     &__number {
@@ -193,6 +206,7 @@ export default {
       &--failed,
       &--passed {
         margin: 0 0 1rem;
+        text-align: center;
       }
 
       &--failed {
@@ -225,6 +239,10 @@ export default {
       justify-content: left;
       flex-grow: 1;
       width: 100%;
+
+      span {
+        text-align: left;
+      }
 
       @media screen and (min-width: 1024px) {
         width: auto;
@@ -289,7 +307,7 @@ export default {
     background: #b7b7b7;
     height: 0.375rem;
 
-    &--bar {
+    &__bar {
       transition: 0.5s;
       width: 0;
       height: 100%;
@@ -297,6 +315,14 @@ export default {
       left: 0;
       top: 0;
       background: #f2994a;
+
+      &--passed {
+        background: #00a87a;
+      }
+
+      &--failed {
+        background: #f25b4a;
+      }
     }
   }
 }

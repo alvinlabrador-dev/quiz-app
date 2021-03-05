@@ -1,5 +1,5 @@
 <template>
-  <div class="quiz-wrapper">
+  <div class="quiz-wrapper animate__animated animate__fadeIn">
     <slot name="header">
       <h1>Let's see how good you are with quizzes.</h1>
     </slot>
@@ -9,6 +9,7 @@
         :current="currentItem"
         class="quiz__progress"
       ></app-progress>
+
       <router-view
         :quiz="quizzes[currentItem - 1]"
         :item="currentItem"

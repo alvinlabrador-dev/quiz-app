@@ -1,25 +1,31 @@
 <template>
-  <form class="quiz-modal" @submit.prevent="startQuiz">
-    <h2 class="quiz-modal__header">Select Category</h2>
-    <select
-      name="category"
-      id="category"
-      v-model="selectedCategory"
-      @change="setCategory({ category: selectedCategory })"
-      class="quiz-modal__select"
-    >
-      <option value="" disabled selected>Please select categories...</option>
-      <option
-        :value="category.id"
-        v-for="category in categories"
-        :key="category.id"
+  <transition
+    enter-active-class="animate__animated animate__fadeIn"
+    leave-active-class="animate__animated animate__fadeOut"
+    mode="out-in"
+  >
+    <form class="quiz-modal" @submit.prevent="startQuiz">
+      <h2 class="quiz-modal__header">Select Category</h2>
+      <select
+        name="category"
+        id="category"
+        v-model="selectedCategory"
+        @change="setCategory({ category: selectedCategory })"
+        class="quiz-modal__select"
       >
-        {{ category.name }}
-      </option>
-    </select>
+        <option value="" disabled selected>Please select categories...</option>
+        <option
+          :value="category.id"
+          v-for="category in categories"
+          :key="category.id"
+        >
+          {{ category.name }}
+        </option>
+      </select>
 
-    <app-button type="submit" class="quiz-modal__btn">Start Quiz</app-button>
-  </form>
+      <app-button type="submit" class="quiz-modal__btn">Start Quiz</app-button>
+    </form>
+  </transition>
   <div class="quiz-modal__backdrop"></div>
 </template>
 
@@ -115,8 +121,8 @@ export default {
       top: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(0, 0, 0, 0.9);
     }
   }
 }
-</style> 
+</style>

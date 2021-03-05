@@ -1,6 +1,6 @@
 <template>
   <app-icons />
-  <section>
+  <section class="animate__animated animate__fadeIn">
     <a
       href="https://github.com/alvinlabrador-dev/quiz-app"
       target="blank"
@@ -104,6 +104,10 @@ section {
 
     &:hover {
       opacity: 1;
+    }
+
+    @media screen and (max-width: 767px) {
+      font-size: 0.875rem;
     }
   }
 }
