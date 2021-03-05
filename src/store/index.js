@@ -4,11 +4,32 @@ import { v4 as uuid4 } from "uuid";
 export default createStore({
   state: {
     quizItems: [],
-    categories: []
+    categories: [],
+    category: "",
+    restart: false,
+    anotherQuiz: {
+      name: "Home",
+      query: {
+        restart: true
+      }
+    },
+    loading: false
   },
   mutations: {
     setQuizItems: (state, payload) => {
       state.quizItems = payload.quizItems;
+    },
+    setCategories: (state, payload) => {
+      state.categories = payload.categories;
+    },
+    setCategory: (state, payload) => {
+      state.category = payload.category;
+    },
+    setLoading: (state, payload) => {
+      state.loading = payload;
+    },
+    setRestart: (state, payload) => {
+      state.restart = payload;
     },
     updateQuizItemStatus: (state, payload) => {
       state.quizItems.map(quiz => {
@@ -21,12 +42,12 @@ export default createStore({
   },
   actions: {
     requestQuizes: async (context, payload) => {
-      // payload.category is optional
-      const category = payload.category ? payload.category : "";
+      // set loading
+      context.commit("setLoading", true);
 
       // fetch questions from open trivia db api
       const response = await fetch(
-        `https://opentdb.com/api.php?amount=10&category=${category}&type=multiple`
+        `https://opentdb.com/api.php?amount=10&category=${context.state.category}&type=multiple`
       );
       const quizItems = await response.json();
       const results = quizItems.results ? quizItems.results : [];
@@ -57,10 +78,28 @@ export default createStore({
         })
         .sort((a, b) => a.difficulty - b.difficulty);
 
-      // update the quizItems state
+      // update the quizItems and loading state
       context.commit("setQuizItems", { quizItems: sortResults });
+      context.commit("setLoading", false);
+      context.commit("setRestart", false);
+      context.commit("setCategory", { category: "" });
+
+      if (payload.callback) payload.callback();
 
       return true;
+    },
+    getCategories: async context => {
+      // fetch categories from open trivia db api
+      const response = await fetch("https://opentdb.com/api_category.php");
+      const resJson = await response.json();
+      const categories = resJson.trivia_categories
+        ? resJson.trivia_categories
+        : [];
+
+      // update the categories state
+      context.commit("setCategories", {
+        categories
+      });
     }
   },
   getters: {
@@ -70,6 +109,8 @@ export default createStore({
     quizCategories: (_, getters) => [
       ...new Set(getters.quizzes.map(quiz => quiz.category))
     ],
-    quizCategoriesCount: (_, getters) => getters.quizCategories.length
+    quizCategoriesCount: (_, getters) => getters.quizCategories.length,
+    availableCategories: state => state.categories,
+    selectedCategory: state => state.category
   }
 });

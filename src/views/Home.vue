@@ -1,10 +1,11 @@
 <template>
+  <router-view></router-view>
   <div class="page-content">
     <div v-if="!loading">
       <h1>Let's see how good you are with quizzes.</h1>
       <button-group class="btn-grp">
         <app-button @click="getQuizzess">Take the quiz now</app-button> or
-        <a class="link">Select category</a>
+        <router-link to="/category" class="link">Select category</router-link>
       </button-group>
     </div>
     <app-loading v-else />
@@ -15,7 +16,7 @@
 import AppButton from "@/components/AppButton";
 import ButtonGroup from "@/components/ButtonGroup";
 import AppLoading from "@/components/AppLoading";
-import { mapActions } from "vuex";
+import { mapActions, mapState } from "vuex";
 export default {
   name: "Home",
   components: {
@@ -23,20 +24,27 @@ export default {
     ButtonGroup,
     AppLoading
   },
-  data() {
-    return {
-      loading: false
-    };
+  computed: {
+    ...mapState(["loading", "restart"])
+  },
+  watch: {
+    restart(newVal) {
+      if (newVal) this.getQuizzess();
+    }
   },
   methods: {
     ...mapActions(["requestQuizes"]),
-    async getQuizzess($event, category = "") {
-      this.loading = true;
-      const result = await this.requestQuizes(category);
-
-      console.log("result", result);
+    async getQuizzess() {
+      await this.requestQuizes({ callback: this.goToQuiz });
+    },
+    goToQuiz() {
       this.$router.push("/quiz/item1");
     }
+  },
+  mounted() {
+    // trigger quiz request if restart parameter is present
+    const params = this.$route.query;
+    if (params.restart) this.getQuizzess();
   }
 };
 </script>

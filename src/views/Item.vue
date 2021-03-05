@@ -47,26 +47,56 @@
 
       <div class="quiz__item__result" v-if="lastStepAnswered">
         <p v-html="resultMessage"></p>
-        <p v-if="isGood">It's fun right? Try another quiz</p>
-        <p v-else>That's alright you can try another quiz</p>
+        <p v-if="isGood">
+          It's fun right? Try
+          <router-link :to="anotherQuiz" class="quiz__item__result__link"
+            >another quiz
+            <span class="quiz__item__result__icon"
+              ><app-icon name="refresh"
+            /></span>
+          </router-link>
+        </p>
+        <p v-else>
+          That's alright you can try
+          <router-link :to="anotherQuiz" class="quiz__item__result__link"
+            >another quiz
+            <span class="quiz__item__result__icon"
+              ><app-icon name="refresh"
+            /></span>
+          </router-link>
+        </p>
+        <p>
+          Go back to
+          <router-link :to="home" class="quiz__item__result__link"
+            >homepage</router-link
+          >.
+        </p>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { mapMutations, mapGetters } from "vuex";
+import { mapMutations, mapGetters, mapState } from "vuex";
+import AppIcon from "@/components/AppIcon";
 export default {
   name: "TheQuiz",
   props: ["item", "quiz"],
+  components: {
+    AppIcon
+  },
   data() {
     return {
       choices: ["a", "b", "c", "d"],
-      answer: ""
+      answer: "",
+      home: {
+        name: "Home"
+      }
     };
   },
   computed: {
     ...mapGetters(["correctAnswersCount", "quizCategoriesCount"]),
+    ...mapState(["anotherQuiz"]),
     nextItem() {
       return this.item < 10 ? this.item + 1 : 10;
     },
@@ -81,8 +111,11 @@ export default {
     },
     resultMessage() {
       return `
-        You got ${this.correctAnswersCount}/10 correct answers from 4 categories. ${this.isGood}
+        You got ${this.correctAnswersCount}/10 correct answers from ${this.quizCategoriesCount} ${this.resultCategories}. ${this.isGood}
       `;
+    },
+    resultCategories() {
+      return this.quizCategoriesCount > 1 ? "categories" : "category";
     },
     resultHeading() {
       return `You ${this.isGood ? "Passed" : "Failed"}!`;
@@ -156,6 +189,18 @@ export default {
         margin: 0 0 3rem;
         text-align: center;
       }
+
+      &--failed,
+      &--passed {
+        margin: 0 0 1rem;
+      }
+
+      &--failed {
+        color: #f25b4a;
+      }
+      &--passed {
+        color: #00a87a;
+      }
     }
 
     &__answers {
@@ -216,6 +261,22 @@ export default {
         &::before {
           border-color: #2c5364;
         }
+      }
+    }
+
+    &__result {
+      font-weight: 600;
+
+      &__link {
+        color: inherit;
+        position: relative;
+        display: inline-flex;
+      }
+
+      &__icon {
+        font-size: 1.5rem;
+        height: 1.5rem;
+        margin: -0.125rem 0 0 0.3125rem;
       }
     }
   }

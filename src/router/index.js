@@ -5,7 +5,15 @@ const routes = [
   {
     path: "/",
     name: "Home",
-    component: Home
+    component: Home,
+    children: [
+      {
+        path: "/category/",
+        name: "Category",
+        component: () =>
+          import(/* webpackChunkName: "category" */ "@/views/Category.vue")
+      }
+    ]
   },
   {
     path: "/quiz/",
