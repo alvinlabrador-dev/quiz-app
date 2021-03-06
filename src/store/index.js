@@ -88,9 +88,6 @@ export default createStore({
       context.commit("setRestart", false);
       context.commit("setCategory", { category: "" });
 
-      // delay setting the loading value to avoid flashes
-      setTimeout(context.commit("setLoading", false), 1000);
-
       return true;
     },
     getCategories: async context => {

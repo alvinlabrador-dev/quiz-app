@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
+import store from "@/store";
+
 import Home from "@/views/Home";
 
 const routes = [
@@ -26,7 +28,12 @@ const routes = [
         component: () =>
           import(/* webpackChunkName: "item" */ "@/views/Item.vue")
       }
-    ]
+    ],
+    beforeEnter(_, __, next) {
+      // redirect if quiz is access directly
+      if (!store.state.quizItems.length) next("/");
+      else next();
+    }
   }
 ];
 

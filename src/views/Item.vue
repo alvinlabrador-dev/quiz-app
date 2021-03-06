@@ -4,7 +4,7 @@
     leave-active-class="animate__animated animate__fadeOut"
     mode="out-in"
   >
-    <div class="quiz" v-if="quiz.hasOwnProperty('category')">
+    <div class="quiz" v-if="quiz && quiz.category">
       <div class="quiz__info">
         <div class="quiz__info__number">
           Question <strong>#{{ item }}</strong
@@ -141,7 +141,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(["updateQuizItemStatus"]),
+    ...mapMutations(["updateQuizItemStatus", "setLoading"]),
     updateStatus() {
       // update quiz status
       this.updateQuizItemStatus({ status: this.status, id: this.quiz.id });
@@ -149,6 +149,10 @@ export default {
       // redirect to next item
       if (this.item !== 10) this.$router.replace(`/quiz/item${this.nextItem}`);
     }
+  },
+  mounted() {
+    // set loading state to false
+    this.setLoading(false);
   }
 };
 </script>
